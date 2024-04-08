@@ -11,6 +11,9 @@ class Figure:
     def area(self):
         return 0.0
 
+    def n_timer(self):
+        return 0
+
 
 class Void(Figure):
     """ "Hульугольник" """
@@ -27,6 +30,12 @@ class Point(Figure):
 
     def add(self, q):
         return self if self.p == q else Segment(self.p, q)
+
+    def n_timer(self):
+        if abs(self.p.y) < 1:
+            return 1
+        else:
+            return 0
 
 
 class Segment(Figure):
@@ -48,6 +57,14 @@ class Segment(Figure):
         else:
             return Segment(self.p, r)
 
+    def n_timer(self):
+        if abs(self.p.y) < 1 or abs(self.q.y) < 1 or (
+                self.p.y >= 1 and self.q.y <= -1 or
+                self.p.y <= -1 and self.q.y >= 1):
+            return 'continum'
+        else:
+            return 0
+
 
 class Polygon(Figure):
     """ Многоугольник """
@@ -63,6 +80,15 @@ class Polygon(Figure):
             self.points.push_first(c)
         self._perimeter = a.dist(b) + b.dist(c) + c.dist(a)
         self._area = abs(R2Point.area(a, b, c))
+        w1 = a.y <= -1
+        w2 = b.y <= -1
+        w3 = c.y <= -1
+        if (abs(a.y) < 1) or (abs(b.y) < 1) or (abs(c.y) < 1):
+            self._n_timer = 'continum'
+        elif (w1 and w2 and w3) or (not (w1) and not (w2) and not (w3)):
+            self._n_timer = 0
+        else:
+            self._n_timer = 'continum'
 
     def perimeter(self):
         return self._perimeter
@@ -70,9 +96,13 @@ class Polygon(Figure):
     def area(self):
         return self._area
 
+    def n_timer(self):
+        return self._n_timer
+
     # добавление новой точки
     def add(self, t):
 
+        k = self.points.first().y <= -1
         # поиск освещённого ребра
         for n in range(self.points.size()):
             if t.is_light(self.points.last(), self.points.first()):
@@ -105,14 +135,22 @@ class Polygon(Figure):
             self.points.push_last(p)
 
             # добавление двух новых рёбер
-            self._perimeter += t.dist(self.points.first()) + \
-                t.dist(self.points.last())
+            self._perimeter += (
+                    t.dist(self.points.first()) + t.dist(self.points.last()))
             self.points.push_first(t)
+
+            if self._n_timer != 'continum':
+                if ((t.y <= -1) and k) or (not (k) and (t.y >= 1)):
+                    self._n_timer = 0
+                else:
+                    self._n_timer = 'continum'
+            else:
+                self._n_timer = 'continum'
 
         return self
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     f = Void()
     print(type(f), f.__dict__)
     f = f.add(R2Point(0.0, 0.0))

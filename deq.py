@@ -37,7 +37,7 @@ class Deq:
         return self.array[0]
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     s = Deq()
     print(s.__dict__)
     s.push_first(1)

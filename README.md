@@ -67,23 +67,28 @@ main_version: 2
 
 ### Запуск тестов
 
-Команда
+Уже известная нам команда (см. материал, посвящённый тестированию программ)
 
-    python -B -m unittest discover tests
+    python -B -m pytest -p no:cacheprovider tests
 
-запускает unit-тесты, выполняя все начинающиеся с `test` методы классов,
+запускает pytest, выполняя все начинающиеся с `test` методы классов,
 имена которых начинаются с `Test`, содержащиеся во всех файлах `test_*.py`
 директории `tests`.
 
 Вот как примерно может выглядеть результат запуска этой команды:
 
 ~~~
-[roganov@aorus convex]$ python -m unittest discover tests
-...............................................
-----------------------------------------------------------------------
-Ran 47 tests in 0.001s
+[roganov@aorus convex]$ python -B -m pytest -p no:cacheprovider tests
+============================= test session starts ==============================
+platform linux -- Python 3.12.0, pytest-7.4.3, pluggy-1.3.0
+rootdir: /home/roganov/convex
+plugins: mock-3.12.0
+collected 47 items                                                             
 
-OK
+tests/test_convex.py ..............................                      [ 63%]
+tests/test_r2point.py .................                                  [100%]
+
+============================== 47 passed in 0.07s ==============================
 ~~~
 
 ### Проверка покрытия тестами кода программы
@@ -93,36 +98,43 @@ OK
 её использовать:
 
 ~~~
-[roganov@aorus convex]$ python -B -m coverage run -m unittest discover tests
-................................................
-----------------------------------------------------------------------
-Ran 48 tests in 0.005s
+[roganov@aorus convex]$ export PYTHONDONTWRITEBYTECODE=yes
+[roganov@aorus convex]$ 
 
-OK
-[roganov@aorus convex]$ python -m coverage report; rm -f .coverage
-Name                    Stmts   Miss  Cover
--------------------------------------------
-convex.py                  66      0   100%
-deq.py                     17      0   100%
-r2point.py                 25      0   100%
-tests/test_convex.py       87      0   100%
+============================= test session starts ==============================
+platform linux -- Python 3.12.0, pytest-7.4.3, pluggy-1.3.0
+rootdir: /home/roganov/convex
+plugins: mock-3.12.0
+collected 47 items                                                             
+
+tests/test_convex.py ..............................                      [ 63%]
+tests/test_r2point.py .................                                  [100%]
+
+============================== 47 passed in 0.17s ==============================
+Name                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------
+convex.py                  75      8    89%   116-123
+deq.py                     25      7    72%   41-47
+r2point.py                 31      5    84%   49-53
+tests/test_convex.py       81      0   100%
 tests/test_r2point.py      55      0   100%
--------------------------------------------
-TOTAL                     250      0   100%
+-----------------------------------------------------
+TOTAL                     267     20    93%
 ~~~
 
+Полученный результат говорит нам о том, что не все строки тестируемых
+`py'-файлов проекта проверяются во время тестов. Насколько это плохо
+и можем ли мы «исправить» ситуацию?
+
+> Установка переменной окружения (environment) `PYTHONDONTWRITEBYTECODE`
+> запрещает интерпретатору языка Python создавать `pyc`-файлы.
+> При запуске тестов мы добивались этого передавая интерпретатору
+> ключ `-B`, но `coverage` не позволяет так поступить.
 
 > Вышеприведённая команда выполняет последовательно три действия:
 >     - `coverage` запускает тесты;
 >     - в случае их успешного завершения печатается отчёт `coverage`;
 >     - и удаляется файл `.coverage`
-
-Также можно создать отчёт о тестовом покрытии в формате HTML. Для этого
-вместо команды `python -m coverage report` нужно выполнить команду 
-`python -m coverage html`. В результате будет создана директория `htmlcov`, 
-содержащая подробные HTML-версии отчётов по каждому файлу.
-
-Для просмотра отчёта следует открыть файл `htmlconv/index.html` в браузере.
 
 ### Запуск программы
 

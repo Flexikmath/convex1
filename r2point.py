@@ -45,7 +45,7 @@ class R2Point:
         return False
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     x = R2Point(1.0, 1.0)
     print(type(x), x.__dict__)
     print(x.dist(R2Point(1.0, 0.0)))

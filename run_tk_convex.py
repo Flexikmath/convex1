@@ -32,12 +32,16 @@ tk = TkDrawer()
 f = Void()
 tk.clean()
 
+tk.draw_line(R2Point(-6.0, 1.0), R2Point(6.0, 1.0))
+tk.draw_line(R2Point(-6.0, -1.0), R2Point(6.0, -1.0))
 try:
     while True:
         f = f.add(R2Point())
         tk.clean()
+        tk.draw_line(R2Point(-6.0, 1.0), R2Point(6.0, 1.0))
+        tk.draw_line(R2Point(-6.0, -1.0), R2Point(6.0, -1.0))
         f.draw(tk)
-        print(f"S = {f.area()}, P = {f.perimeter()}\n")
+        print(f"S = {f.area()}, P = {f.perimeter()}, M = {f.n_timer()}\n")
 except (EOFError, KeyboardInterrupt):
     print("\nStop")
     tk.close()
